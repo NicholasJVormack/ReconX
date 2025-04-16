@@ -104,12 +104,58 @@ def scan_with_nmap(target):
         print(error_message)
         log_result(error_message)
 
+def detect_active_hosts(network_prefix):
+    """
+    Scans a network range to detect active hosts.
+
+    Parameters:
+    network_prefix (str): The first three octets of the network (e.g., '192.168.1')
+
+    Returns:
+    list: List of active IP addresses detected.
+    """
+    print(f"\nScanning network {network_prefix}.x for active hosts...\n")
+
+    active_hosts = []
+    for i in range(1, 255):  # Scan IPs from .1 to .254
+        ip = f"{network_prefix}.{i}"
+        result = subprocess.run(["ping", "-n", "1", "-w", "500", ip], capture_output=True, text=True)
+
+        if "Reply from" in result.stdout:  # If the ping gets a response, the host is active
+            print(f"Active host detected: {ip}")
+            active_hosts.append(ip)
+
+    return active_hosts
+
 # Entry point of the script
 if __name__ == "__main__":
-    target_ip = input("Enter target IP: ")  # Prompt user for target IP
+    print("Select mode:")
+    print("(1) Scan specific target")
+    print("(2) Detect active hosts in a network\n")
+    
+    scan_choice = input("Enter 1 or 2: ").strip()
 
-    common_ports = [22, 80, 443, 3306, 8080, 21, 25, 53, 110, 143]
+    if scan_choice == "1":
+        # Prompt user for target IP
+        target_ip = input("Enter target IP: ")
 
-    scan_target(target_ip, common_ports)
+        # Prompt user to enter custom ports
+        custom_ports_input = input("Enter ports to scan (comma-separated, e.g., 22,80,443): ")
+        custom_ports = [int(port.strip()) for port in custom_ports_input.split(",") if port.strip().isdigit()]
+
+        scan_target(target_ip, custom_ports)  # Start scanning
+
+    elif scan_choice == "2":
+        # Detect active hosts
+        network_prefix = input("Enter first three octets of the network (e.g., 192.168.1): ").strip()
+        active_hosts = detect_active_hosts(network_prefix)
+
+        # Display detected hosts
+        print("\nActive hosts detected:")
+        for host in active_hosts:
+            print(host)
+
+    else:
+        print("Invalid selection. Please restart the script and enter either 1 or 2.")
 
     print("\nScan results saved to scan_results.txt")
