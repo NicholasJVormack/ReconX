@@ -5,15 +5,16 @@ import subprocess  # Runs external Nmap scans
 # Define log file name
 LOG_FILE = "scan_results.txt"
 
-def log_result(message):
+def log_result(message, section="General"):
     """
-    Writes scan results to a log file.
+    Writes structured scan results to a log file with section headers.
 
     Parameters:
     message (str): The text to be written into the log file.
+    section (str): The category of the message (e.g., 'Port Scan', 'Banner Grab', 'Nmap Results').
     """
     with open(LOG_FILE, "a") as log_file:
-        log_file.write(message + "\n")
+        log_file.write(f"[{section}]\n{message}\n\n")
 
 def grab_banner(s):
     """
@@ -51,13 +52,13 @@ def scan_port(target, port):
         if result == 0:
             message = f"Port {port} is OPEN on {target}"
             print(message)
-            log_result(message)
+            log_result(message, "Port Scan")  # Logs under "Port Scan"
 
             # Banner grabbing for additional information
             banner = grab_banner(s)
             banner_message = f"Banner on port {port}: {banner}"
             print(banner_message)
-            log_result(banner_message)
+            log_result(banner_message, "Banner Grab")  # Logs under "Banner Grab"
 
         s.close()
     except Exception as e:
@@ -98,7 +99,7 @@ def scan_with_nmap(target):
     try:
         result = subprocess.run(["nmap", "-sV", target], capture_output=True, text=True)
         print(result.stdout)
-        log_result(result.stdout)
+        log_result(result.stdout, "Nmap Results")  # Logs under "Nmap Results"
     except Exception as e:
         error_message = f"Error running Nmap scan: {e}"
         print(error_message)
@@ -158,4 +159,10 @@ if __name__ == "__main__":
     else:
         print("Invalid selection. Please restart the script and enter either 1 or 2.")
 
-    print("\nScan results saved to scan_results.txt")
+    print("\n===== Scan Summary Report =====")
+    print(f"Target: {target_ip}")
+    print(f"Ports Scanned: {', '.join(map(str, custom_ports))}")
+
+    log_result(f"\n===== Scan Summary Report =====\nTarget: {target_ip}\nPorts Scanned: {', '.join(map(str, custom_ports))}", "Scan Summary")
+
+    print("\nResults saved to scan_results.txt")

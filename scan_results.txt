@@ -34,3 +34,110 @@ Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
 Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
 Nmap done: 1 IP address (1 host up) scanned in 11.48 seconds
 
+Scanning 127.0.0.1 with 1 ports...
+
+Port 2869 is OPEN on 127.0.0.1
+Banner on port 2869: HTTP/1.1 400 Bad Request
+Content-Length: 334
+Content-Type: text/html; charset=us-ascii
+Server: Microsoft-HTTPAPI/2.0
+Date: Wed, 16 Apr 2025 16:44:14 GMT
+Connection: close
+
+Running Nmap scan on 127.0.0.1...
+
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-04-16 12:44 Eastern Daylight Time
+Nmap scan report for localhost.lan (127.0.0.1)
+Host is up (0.000056s latency).
+Not shown: 997 closed tcp ports (reset)
+PORT     STATE SERVICE       VERSION
+135/tcp  open  msrpc         Microsoft Windows RPC
+445/tcp  open  microsoft-ds?
+2869/tcp open  http          Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 11.50 seconds
+
+[General]
+Scanning 127.0.0.1 with 1 ports...
+
+
+[Port Scan]
+Port 2869 is OPEN on 127.0.0.1
+
+[Banner Grab]
+Banner on port 2869: HTTP/1.1 400 Bad Request
+Content-Length: 334
+Content-Type: text/html; charset=us-ascii
+Server: Microsoft-HTTPAPI/2.0
+Date: Wed, 16 Apr 2025 16:57:41 GMT
+Connection: close
+
+[General]
+
+Running Nmap scan on 127.0.0.1...
+
+
+[Nmap Results]
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-04-16 12:57 Eastern Daylight Time
+Nmap scan report for localhost.lan (127.0.0.1)
+Host is up (0.00034s latency).
+Not shown: 997 closed tcp ports (reset)
+PORT     STATE SERVICE       VERSION
+135/tcp  open  msrpc         Microsoft Windows RPC
+445/tcp  open  microsoft-ds?
+2869/tcp open  http          Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 11.50 seconds
+
+
+[Scan Summary]
+
+===== Scan Summary Report =====
+Target: 127.0.0.1
+Ports Scanned: 2869
+
+[General]
+Scanning 127.0.0.1 with 1 ports...
+
+
+[Port Scan]
+Port 2869 is OPEN on 127.0.0.1
+
+[Banner Grab]
+Banner on port 2869: HTTP/1.1 400 Bad Request
+Content-Length: 334
+Content-Type: text/html; charset=us-ascii
+Server: Microsoft-HTTPAPI/2.0
+Date: Wed, 16 Apr 2025 16:58:18 GMT
+Connection: close
+
+[General]
+
+Running Nmap scan on 127.0.0.1...
+
+
+[Nmap Results]
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-04-16 12:58 Eastern Daylight Time
+Nmap scan report for localhost.lan (127.0.0.1)
+Host is up (0.00010s latency).
+Not shown: 997 closed tcp ports (reset)
+PORT     STATE SERVICE       VERSION
+135/tcp  open  msrpc         Microsoft Windows RPC
+445/tcp  open  microsoft-ds?
+2869/tcp open  http          Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 11.49 seconds
+
+
+[Scan Summary]
+
+===== Scan Summary Report =====
+Target: 127.0.0.1
+Ports Scanned: 2869
+
