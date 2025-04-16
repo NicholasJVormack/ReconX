@@ -1,0 +1,7 @@
+Timestamp,Target IP,Port,Status,Banner
+2025-04-16 14:32:50,127.0.0.1,2869,OPEN,"HTTP/1.1 400 Bad Request
+Content-Length: 334
+Content-Type: text/html; charset=us-ascii
+Server: Microsoft-HTTPAPI/2.0
+Date: Wed, 16 Apr 2025 18:32:50 GMT
+Connection: close"
