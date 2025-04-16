@@ -3,8 +3,9 @@ import threading  # Enables multi-threading for faster port scanning
 import subprocess  # Runs external Nmap scans
 import datetime  # Used for timestamps
 
-# Define log file name
-LOG_FILE = "scan_results.txt"
+# Generate a unique file name based on the current time
+timestamp_filename = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+LOG_FILE = f"scan_results_{timestamp_filename}.txt"
 
 def log_result(message, section="General"):
     """
@@ -178,4 +179,4 @@ if __name__ == "__main__":
 
     log_result(f"\n===== Scan Summary Report =====\nTarget: {target_ip}\nPorts Scanned: {', '.join(map(str, custom_ports))}", "Scan Summary")
 
-    print("\nResults saved to scan_results.txt")
+    print(f"\nScan results saved to {LOG_FILE}")
