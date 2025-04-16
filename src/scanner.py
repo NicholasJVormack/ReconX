@@ -15,6 +15,23 @@ def log_result(message):
     with open(LOG_FILE, "a") as log_file:
         log_file.write(message + "\n")
 
+def grab_banner(s):
+    """
+    Attempts to retrieve a banner from an open port.
+
+    Parameters:
+    s (socket): The socket object connected to a target port.
+
+    Returns:
+    str: The retrieved banner, or None if unavailable.
+    """
+    try:
+        s.send(b"HEAD / HTTP/1.1\r\n\r\n")  # Basic HTTP request
+        banner = s.recv(1024).decode().strip()  # Read banner data
+        return banner if banner else "No banner retrieved"
+    except Exception:
+        return "No banner retrieved"
+
 def scan_port(target, port):
     """
     Scans a single port on a target IP using a basic socket connection.
@@ -25,30 +42,32 @@ def scan_port(target, port):
     port (int): The port number to check.
     """
     try:
-        # Print debug message to show progress
         print(f"DEBUG: Checking port {port} on {target}...")
 
-        # Create a socket for the scan
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.settimeout(1)  # Set timeout to prevent long waits
-
-        result = s.connect_ex((target, port))  # Attempt connection
+        s.settimeout(2)  # Increased timeout for better accuracy
+        result = s.connect_ex((target, port))
 
         if result == 0:
             message = f"Port {port} is OPEN on {target}"
             print(message)
-            log_result(message)  # Log the open port result
+            log_result(message)
 
-        s.close()  # Close socket to free resources
+            # Banner grabbing for additional information
+            banner = grab_banner(s)
+            banner_message = f"Banner on port {port}: {banner}"
+            print(banner_message)
+            log_result(banner_message)
+
+        s.close()
     except Exception as e:
         error_message = f"Error scanning port {port}: {e}"
         print(error_message)
-        log_result(error_message)  # Log errors
+        log_result(error_message)
 
 def scan_target(target, ports):
     """
-    Uses multi-threading to scan multiple ports on a target IP simultaneously.
-    Also triggers an Nmap scan for deeper insights.
+    Uses multi-threading to scan multiple ports and retrieve banners.
 
     Parameters:
     target (str): The IP address to scan.
@@ -57,7 +76,6 @@ def scan_target(target, ports):
     print(f"Scanning {target} with {len(ports)} ports...\n")
     log_result(f"Scanning {target} with {len(ports)} ports...\n")
 
-    # Create and start a thread for each port scan
     threads = []
     for port in ports:
         print(f"DEBUG: Starting scan for port {port}...")
@@ -65,36 +83,22 @@ def scan_target(target, ports):
         threads.append(t)
         t.start()
 
-    # Ensure all threads finish before continuing
     for t in threads:
         t.join()
 
-    # After basic scanning, run an Nmap scan for deeper insights
     scan_with_nmap(target)
 
 def scan_with_nmap(target):
     """
-    Performs an advanced scan on a target IP using Nmap and logs the results.
-
-    Parameters:
-    target (str): The IP address to scan.
-    
-    Nmap will check for:
-    - Open ports
-    - Running services
-    - Additional security details
+    Uses Nmap to perform a deeper scan of open ports and services.
     """
     print(f"\nDEBUG: Running Nmap scan on {target}...\n")
     log_result(f"\nRunning Nmap scan on {target}...\n")
 
     try:
-        # Execute Nmap to detect open ports and services
         result = subprocess.run(["nmap", "-sV", target], capture_output=True, text=True)
-
-        # Print and log the scan results
         print(result.stdout)
         log_result(result.stdout)
-
     except Exception as e:
         error_message = f"Error running Nmap scan: {e}"
         print(error_message)
@@ -103,11 +107,9 @@ def scan_with_nmap(target):
 # Entry point of the script
 if __name__ == "__main__":
     target_ip = input("Enter target IP: ")  # Prompt user for target IP
-    
-    # Expanded list of common ports to scan
+
     common_ports = [22, 80, 443, 3306, 8080, 21, 25, 53, 110, 143]
-    
-    # Start scanning process
+
     scan_target(target_ip, common_ports)
 
     print("\nScan results saved to scan_results.txt")
