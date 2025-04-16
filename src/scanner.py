@@ -5,9 +5,12 @@ import datetime  # Used for timestamps
 import csv  # Enables CSV writing
 import os # Required for folder creation
 
+# Generate or use a main folder called Scans to store all uniquely timestamped scans
+MAIN_FOLDER = "Scans"
+os.makedirs(MAIN_FOLDER, exist_ok=True)  # Create "Scans" if it doesn't exist
 # Generate a unique folder name based on the scan timestamp
-scan_folder = f"scan_results_{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
-os.makedirs(scan_folder)  # Create the folder
+scan_folder = os.path.join(MAIN_FOLDER, f"scan_results_{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}")
+os.makedirs(scan_folder)  # Create timestamped scan folder inside "Scans"
 
 # Generate unique filenames for each scan
 timestamp_filename = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
