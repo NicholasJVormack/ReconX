@@ -1,20 +1,22 @@
 import socket  # Handles basic network connections
 import threading  # Enables multi-threading for faster port scanning
 import subprocess  # Runs external Nmap scans
+import datetime  # Used for timestamps
 
 # Define log file name
 LOG_FILE = "scan_results.txt"
 
 def log_result(message, section="General"):
     """
-    Writes structured scan results to a log file with section headers.
+    Writes structured scan results to a log file with section headers and timestamps.
 
     Parameters:
     message (str): The text to be written into the log file.
     section (str): The category of the message (e.g., 'Port Scan', 'Banner Grab', 'Nmap Results').
     """
+    timestamp = datetime.datetime.now().strftime("[%Y-%m-%d %H:%M:%S]")
     with open(LOG_FILE, "a") as log_file:
-        log_file.write(f"[{section}]\n{message}\n\n")
+        log_file.write(f"{timestamp} [{section}]\n{message}\n\n")
 
 def grab_banner(s):
     """
@@ -74,8 +76,14 @@ def scan_target(target, ports):
     target (str): The IP address to scan.
     ports (list): List of ports to check.
     """
+
+    # Capture the start time of the scan
+    scan_start_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print(f"\nScan started at: {scan_start_time}")
+    log_result(f"Scan started at: {scan_start_time}", "Scan Metadata")
+
     print(f"Scanning {target} with {len(ports)} ports...\n")
-    log_result(f"Scanning {target} with {len(ports)} ports...\n")
+    log_result(f"Scanning {target} with {len(ports)} ports...\n", "Port Scan")
 
     threads = []
     for port in ports:
@@ -88,6 +96,11 @@ def scan_target(target, ports):
         t.join()
 
     scan_with_nmap(target)
+
+ # Capture the end time of the scan
+    scan_end_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print(f"\nScan completed at: {scan_end_time}")
+    log_result(f"Scan completed at: {scan_end_time}", "Scan Metadata")
 
 def scan_with_nmap(target):
     """
