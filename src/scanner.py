@@ -2,10 +2,23 @@ import socket  # Handles basic network connections
 import threading  # Enables multi-threading for faster port scanning
 import subprocess  # Runs external Nmap scans
 
+# Define log file name
+LOG_FILE = "scan_results.txt"
+
+def log_result(message):
+    """
+    Writes scan results to a log file.
+
+    Parameters:
+    message (str): The text to be written into the log file.
+    """
+    with open(LOG_FILE, "a") as log_file:
+        log_file.write(message + "\n")
+
 def scan_port(target, port):
     """
     Scans a single port on a target IP using a basic socket connection.
-    If successful, marks the port as open.
+    If successful, marks the port as open and logs the result.
 
     Parameters:
     target (str): The IP address to scan.
@@ -22,11 +35,15 @@ def scan_port(target, port):
         result = s.connect_ex((target, port))  # Attempt connection
 
         if result == 0:
-            print(f"Port {port} is OPEN")  # If connection succeeds, port is open
+            message = f"Port {port} is OPEN on {target}"
+            print(message)
+            log_result(message)  # Log the open port result
 
         s.close()  # Close socket to free resources
     except Exception as e:
-        print(f"Error scanning port {port}: {e}")  # Handle errors
+        error_message = f"Error scanning port {port}: {e}"
+        print(error_message)
+        log_result(error_message)  # Log errors
 
 def scan_target(target, ports):
     """
@@ -38,11 +55,12 @@ def scan_target(target, ports):
     ports (list): List of ports to check.
     """
     print(f"Scanning {target} with {len(ports)} ports...\n")
+    log_result(f"Scanning {target} with {len(ports)} ports...\n")
 
     # Create and start a thread for each port scan
     threads = []
     for port in ports:
-        print(f"DEBUG: Starting scan for port {port}...")  # Debug output
+        print(f"DEBUG: Starting scan for port {port}...")
         t = threading.Thread(target=scan_port, args=(target, port))
         threads.append(t)
         t.start()
@@ -56,7 +74,7 @@ def scan_target(target, ports):
 
 def scan_with_nmap(target):
     """
-    Performs an advanced scan on a target IP using Nmap.
+    Performs an advanced scan on a target IP using Nmap and logs the results.
 
     Parameters:
     target (str): The IP address to scan.
@@ -67,16 +85,20 @@ def scan_with_nmap(target):
     - Additional security details
     """
     print(f"\nDEBUG: Running Nmap scan on {target}...\n")
+    log_result(f"\nRunning Nmap scan on {target}...\n")
 
     try:
         # Execute Nmap to detect open ports and services
         result = subprocess.run(["nmap", "-sV", target], capture_output=True, text=True)
-        
-        # Print the scan results
+
+        # Print and log the scan results
         print(result.stdout)
+        log_result(result.stdout)
 
     except Exception as e:
-        print(f"Error running Nmap scan: {e}")  # Handle errors gracefully
+        error_message = f"Error running Nmap scan: {e}"
+        print(error_message)
+        log_result(error_message)
 
 # Entry point of the script
 if __name__ == "__main__":
@@ -87,3 +109,5 @@ if __name__ == "__main__":
     
     # Start scanning process
     scan_target(target_ip, common_ports)
+
+    print("\nScan results saved to scan_results.txt")
