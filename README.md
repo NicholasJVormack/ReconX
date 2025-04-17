@@ -28,6 +28,10 @@ python scanner.py --target 192.168.1.1 --ports 88,443,22
 ##GUI Version
 python src/gui.py
 
+## ReconX GUI Preview  
+Here’s a screenshot of the ReconX GUI in action:  
+
+![ReconX GUI](ReconXPicture.png)
 
 ##MIT License
 
