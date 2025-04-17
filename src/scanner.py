@@ -6,7 +6,7 @@ import csv  # Enables CSV writing
 import os # Required for folder creation
 
 # Generate or use a main folder called Scans to store all uniquely timestamped scans
-MAIN_FOLDER = "Scans"
+MAIN_FOLDER = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "Scans"))
 os.makedirs(MAIN_FOLDER, exist_ok=True)  # Create "Scans" if it doesn't exist
 # Generate a unique folder name based on the scan timestamp
 scan_folder = os.path.join(MAIN_FOLDER, f"scan_results_{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}")
@@ -48,12 +48,12 @@ def log_to_csv(data):
 
     print(f"DEBUG: Writing CSV report to {CSV_FILE}")
     with open(CSV_FILE, mode="w", newline="") as file:
-        fieldnames = ["Timestamp", "Target IP", "Port", "Status", "Banner"]
+        fieldnames = ["Timestamp", "Target IP", "Port", "Status", "Banner", "Detected OS", "Open Services"]
         writer = csv.DictWriter(file, fieldnames=fieldnames)
         writer.writeheader()
 
         for row in data:
-            writer.writerow(row)
+            writer.writerow(row)  # Now matches expected column headers
 
     print(f"\nCSV report saved inside {scan_folder}")
 
@@ -100,7 +100,7 @@ def grab_banner(s):
     except Exception:
         return "No banner retrieved"
 
-def scan_port(target, port, scan_results):
+def scan_port(target, port, scan_results, update_terminal):
     """
     Scans a single port and retrieves results.
 
@@ -110,30 +110,34 @@ def scan_port(target, port, scan_results):
     scan_results (list): The list to store scan results.
     """
     try:
-        print(f"DEBUG: Checking port {port} on {target}...")
+        update_terminal(f" [PORT SCAN] Checking port {port} on {target}...")  #  Updates GUI
+
 
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.settimeout(2)  # Increased timeout for better accuracy
         result = s.connect_ex((target, port))
 
         if result == 0:
-            message = f"Port {port} is OPEN on {target}"
-            print(message)
+            message = f" [PORT OPEN] Port {port} is OPEN on {target}"
+            update_terminal(message)  #  Show open port in GUI
             log_result(message, "Port Scan")
 
             # Banner grabbing for additional information
             banner = grab_banner(s)
-            banner_message = f"Banner on port {port}: {banner}"
-            print(banner_message)
+            banner_message = f" [BANNER] {banner}"
+            update_terminal(banner_message)  #  Show banner in GUI
             log_result(banner_message, "Banner Grab")
 
             # Append results to existing scan_results list (without reinitializing it)
             scan_results.append({
-                "Timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                "Target IP": target,
-                "Port": port,
-                "Status": "OPEN",
-                "Banner": banner
+            "Timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "Target IP": target,
+            "Port": port,
+            "Status": "OPEN",
+            "Banner": banner,
+            "Detected OS": scan_with_nmap(target, update_terminal)["Detected OS"],  # Extract OS info
+            "Open Services": ', '.join(scan_with_nmap(target, update_terminal)["Open Services"])  # Extract services list
+
             })
 
         s.close()
@@ -143,7 +147,7 @@ def scan_port(target, port, scan_results):
         print(error_message)
         log_result(error_message)
 
-def scan_target(target, ports):
+def scan_target(target, ports, update_terminal):
     """
     Uses multi-threading to scan multiple ports and retrieve banners.
 
@@ -156,50 +160,82 @@ def scan_target(target, ports):
 
     # Capture the start time of the scan
     scan_start_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    print(f"\nScan started at: {scan_start_time}")
+    update_terminal(f"\nScan started at: {scan_start_time}")
     log_result(f"Scan started at: {scan_start_time}", "Scan Metadata")
 
-    print(f"Scanning {target} with {len(ports)} ports...\n")
+    update_terminal(f"Scanning {target} with {len(ports)} ports...\n")
     log_result(f"Scanning {target} with {len(ports)} ports...\n", "Port Scan")
 
     threads = []
     for port in ports:
-        print(f"DEBUG: Starting scan for port {port}...")
-        t = threading.Thread(target=scan_port, args=(target, port, scan_results))  # Pass scan_results
+        update_terminal(f"DEBUG: Starting scan for port {port}...")
+        t = threading.Thread(target=scan_port, args=(target, port, scan_results, update_terminal))  # Pass scan_results
         threads.append(t)
         t.start()
 
     for t in threads:
         t.join()  # Ensure all threads complete before proceeding
 
-    scan_with_nmap(target)  # Perform deeper Nmap analysis
+    update_terminal(f"Running Nmap scan on {target}...")
+    scan_with_nmap(target, update_terminal)  # Perform deeper Nmap analysis
 
     # Capture the end time of the scan
     scan_end_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    print(f"\nScan completed at: {scan_end_time}")
+    update_terminal(f"\nScan completed at: {scan_end_time}")
     log_result(f"Scan completed at: {scan_end_time}", "Scan Metadata")
 
     # Save reports AFTER all scans complete
     log_to_csv(scan_results)
-    print("\nScan results saved to scan_results.csv")
+    update_terminal("\nScan results saved to scan_results.csv")
     log_to_html(scan_results)
-    print("\nScan results saved to scan_results.html")
+    update_terminal("\nScan results saved to scan_results.html")
 
-def scan_with_nmap(target):
+def scan_with_nmap(target, update_terminal):
     """
-    Uses Nmap to perform a deeper scan of open ports and services.
+    Uses Nmap to perform OS fingerprinting and service detection on the target.
+
+    Parameters:
+    target (str): The IP address to scan.
     """
-    print(f"\nDEBUG: Running Nmap scan on {target}...\n")
+    update_terminal(f" [NMAP SCAN] Running Nmap scan on {target}...\n")
     log_result(f"\nRunning Nmap scan on {target}...\n")
 
     try:
-        result = subprocess.run(["nmap", "-sV", target], capture_output=True, text=True)
-        print(result.stdout)
-        log_result(result.stdout, "Nmap Results")  # Logs under "Nmap Results"
+        # Execute Nmap with OS detection (-O) and service/version detection (-sV)
+        result = subprocess.run(["nmap", "-O", "-sV", target], capture_output=True, text=True)
+        
+        # Extract relevant sections from the output
+        nmap_output = result.stdout.strip()
+        os_info = "Unknown OS"
+        service_info = []
+
+        for line in nmap_output.split("\n"):
+            if "OS details:" in line:
+                os_info = line.split("OS details:")[1].strip()
+            elif "/" in line and "open" in line:  # Matches service detection lines
+                service_info.append(line.strip())
+
+        structured_nmap_results = {
+            "Target IP": target,
+            "Detected OS": os_info,
+            "Open Services": service_info
+        }
+
+        # Log structured results
+        update_terminal(f" [NMAP OS] Detected OS: {os_info}")
+        log_result(f"OS Detection: {os_info}", "Nmap OS Fingerprinting")
+
+        update_terminal(f" [NMAP SERVICES] Open Services:\n{', '.join(service_info)}")
+        log_result(f"Services: {', '.join(service_info)}", "Nmap Service Detection")
+
+        return structured_nmap_results  # Return extracted data for reports
+
     except Exception as e:
-        error_message = f"Error running Nmap scan: {e}"
-        print(error_message)
-        log_result(error_message)
+        error_message = f" [NMAP ERROR] Nmap scan failed: {e}"
+        update_terminal(error_message)
+        log_result(error_message, "Nmap Scan Error")
+        return {"Target IP": target, "Detected OS": "Nmap scan failed", "Open Services": []}
+
 
 def detect_active_hosts(network_prefix):
     """
