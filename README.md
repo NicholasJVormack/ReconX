@@ -6,17 +6,31 @@ ReconX is a lightweight vulnerability scanner designed to identify security risk
 Here’s a screenshot of the ReconX GUI in action:  
 ![ReconX GUI](https://raw.githubusercontent.com/NicholasJVormack/ReconX/main/ReconXPicture.png)
 ## Scope & Objectives
-- **Target Systems:** Web applications, local machines, and networks.
-- **Vulnerability Types:** Open ports, outdated software versions, misconfigurations.
-- **Scanning Techniques:** Using `nmap`, `requests`, and `scapy` for analysis.
-- **Report Format:** JSON-based results with optional PDF export.
-- **Security Considerations:** Compliance with ethical hacking guidelines.
+Target Systems:
+✔ Web applications, local machines, enterprise networks, IoT devices.
+Vulnerability Types:
+✔ Open ports, outdated software versions, misconfigurations, weak encryption, default credentials.
+Scanning Techniques:
+✔ Active & passive reconnaissance using Nmap, requests.
+✔ Banner grabbing for fingerprinting service versions.
+✔ Packet analysis for deeper insight into network activity.
+Report Format:
+✔ JSON-based structured results with optional CSV, HTML, and PDF exports.
+✔ Clear risk classification of detected vulnerabilities.
+Security Considerations:
+✔ Compliance with ethical hacking guidelines and industry standards (OWASP, NIST, MITRE ATT&CK).
+✔ Zero-touch reconnaissance mode for stealthy scanning operations.
+
 
 ## Features
-✔️ Network and system vulnerability scanning  
-✔️ Open port detection  
-✔️ Identification of outdated software  
-✔️ Detailed security reports  
+✔️ Real-time network and system vulnerability scanning
+✔️ Open port detection & service enumeration
+✔️ Detection of outdated software & insecure configurations
+✔️ Interactive GUI for streamlined scanning operations
+✔️ Detailed, structured security reports with multi-format export
+✔️ Multi-threaded scanning to optimize performance
+✔️ Stealth scanning mode to minimize detection risk
+
 
 ## Installation
 ```sh
