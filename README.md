@@ -24,11 +24,17 @@ Security Considerations:
 
 ## Features
 ✔️ Real-time network and system vulnerability scanning
+
 ✔️ Open port detection & service enumeration
+
 ✔️ Detection of outdated software & insecure configurations
+
 ✔️ Interactive GUI for streamlined scanning operations
+
 ✔️ Detailed, structured security reports with multi-format export
+
 ✔️ Multi-threaded scanning to optimize performance
+
 ✔️ Stealth scanning mode to minimize detection risk
 
 
