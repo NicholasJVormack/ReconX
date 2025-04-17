@@ -1,7 +1,0 @@
-Timestamp,Target IP,Port,Status,Banner,Detected OS,Open Services
-2025-04-17 03:48:04,127.0.0.1,2869,OPEN,"HTTP/1.1 400 Bad Request
-Content-Length: 334
-Content-Type: text/html; charset=us-ascii
-Server: Microsoft-HTTPAPI/2.0
-Date: Thu, 17 Apr 2025 07:48:04 GMT
-Connection: close",Unknown OS,"135/tcp  open  msrpc         Microsoft Windows RPC, 445/tcp  open  microsoft-ds?, 2869/tcp open  http          Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)"
