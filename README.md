@@ -17,6 +17,7 @@ Vulnerability Types:
 ✔ Open ports, outdated software versions, misconfigurations, weak encryption, default credentials.
 
 Scanning Techniques:
+
 ✔ Active & passive reconnaissance using Nmap, requests.
 
 ✔ Banner grabbing for fingerprinting service versions.
