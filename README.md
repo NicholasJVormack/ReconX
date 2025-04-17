@@ -23,7 +23,11 @@ cd ReconX
 pip install -r requirements.txt
 
 ##Usage
-python scanner.py --target 192.168.1.1
+python scanner.py --target 192.168.1.1 --ports 88,443,22
+
+##GUI Version
+python src/gui.py
+
 
 ##MIT License
 
